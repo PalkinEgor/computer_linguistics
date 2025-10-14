@@ -144,7 +144,7 @@ class OntologyService:
         object_props = [self.db.collect_node(o).to_dict() for o in record['object_props'] if o]
         return {"datatype": datatype_props, "object": object_props}
     
-    def create_object(self, class_uri, title, description):
+    def create_object(self, class_uri, title, description, arcs=None):
         obj = self.db.create_node({
             "uri": self.db.generate_random_string(),
             "title": title,
@@ -156,6 +156,16 @@ class OntologyService:
         CREATE (o)-[:`rdf:type`]->(c)
         '''
         self.db.run_custom_query(query, {"obj_uri": obj['uri'], "class_uri": class_uri})
+
+        if arcs:
+            for arc in arcs:
+                direction = arc['direction']
+                value_uri = arc['value_uri']
+                relation_type = arc['relation_type']
+                if direction == 1:
+                    self.db.create_arc(obj['uri'], value_uri, relation_type)
+                else:
+                    self.db.create_arc(value_uri, obj['uri'], relation_type)
 
     def update_object(self, uri, title=None, description=None):
         params = {}
