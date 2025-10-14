@@ -15,7 +15,6 @@ class TestRepository:
         test = Test.objects.get(pk = id)
         return self.collect_test(test)
     
-    # Can update test, if "id" in test_data
     def postTest(self, test_data): 
         if 'id' in test_data:
             test = Test.objects.get(pk = id)
