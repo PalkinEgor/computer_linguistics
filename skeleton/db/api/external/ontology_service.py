@@ -1,4 +1,4 @@
-from neo4jHandler import neo4jHandler
+from skeleton.db.api.external.neo4jHandler import neo4jHandler
 
 class OntologyService:
     def __init__(self, handler):
