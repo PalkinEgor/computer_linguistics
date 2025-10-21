@@ -1,6 +1,6 @@
 from django.db import models
 from db_file_storage.model_utils import delete_file, delete_file_if_needed
-
+from api.external.embedder import embedder
 
 class Test(models.Model):
     name = models.TextField()
@@ -22,7 +22,14 @@ class Text(models.Model):
     description = models.TextField(blank=True, null=True)
     text = models.TextField()
     corpus = models.ForeignKey(Corpus, on_delete=models.CASCADE, related_name='texts')
-    has_translation = models.ManyToManyField('self', symmetrical=False, blank=True, related_name='is_translation_of')
+    has_translation = models.ManyToManyField('self', symmetrical=False, blank=True, related_name='is_translation_of')    
+    embedding = models.JSONField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.embedding and self.text:
+            emb = embedder.get_embeddings([self.text])[0]
+            self.embedding = emb.tolist()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
